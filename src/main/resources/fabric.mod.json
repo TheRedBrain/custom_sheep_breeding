@@ -1,41 +1,34 @@
 {
 	"schemaVersion": 1,
-	"id": "modid",
-	"version": "${version}",
-	"name": "Example mod",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"id": "customsheepbreeding",
+	"version": "0.0.1",
+	"name": "Custom Sheep Breeding",
+	"description": "This Minecraft mod changes the breeding mechanics of sheep.",
 	"authors": [
-		"Me!"
+		"TheRedBrain"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/TheRedBrain/customsheepbreeding"
 	},
-	"license": "CC0-1.0",
-	"icon": "assets/modid/icon.png",
+
+	"license": "MIT",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.example.ExampleMod"
+			"com.github.theredbrain.customsheepbreeding.CustomSheepBreeding"
 		],
 		"client": [
-			"com.example.ExampleModClient"
+			"com.github.theredbrain.customsheepbreeding.CustomSheepBreedingClient"
 		]
 	},
 	"mixins": [
-		"modid.mixins.json",
-		{
-			"config": "modid.client.mixins.json",
-			"environment": "client"
-		}
+		"customsheepbreeding.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.15.0",
-		"minecraft": "~1.20.4",
+		"fabricloader": ">=0.15.7",
+		"minecraft": "1.20.4",
 		"java": ">=17",
-		"fabric-api": "*"
-	},
-	"suggests": {
-		"another-mod": "*"
+		"fabric-api": "*",
+		"cloth-config": ">=13.0.121"
 	}
 }
