@@ -114,7 +114,6 @@ public abstract class SheepEntityMixin extends AnimalEntity implements DuckSheep
     }
 
     @Inject(method = "initialize", at = @At("RETURN"))
-    @Nullable
     public void customsheepbreeding$initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, EntityData entityData, NbtCompound entityNbt, CallbackInfoReturnable<EntityData> cir) {
         this.customsheepbreeding$setNaturalColor(this.getColor());
     }

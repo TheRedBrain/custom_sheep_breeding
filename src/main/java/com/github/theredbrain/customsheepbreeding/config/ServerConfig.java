@@ -10,14 +10,16 @@ import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
 public class ServerConfig implements ConfigData {
     @Comment("""
             Initial spawn colors and their weight
+            
             (in the default configuration this translates to:
             a 81.836% chance for white,
             a 5% chance for black,
             a 5% chance for gray,
             a 5% chance for light_gray,
             a 3% chance for brown,
-            a 0.164% chance for pink,
-            which is equal to the vanilla chances)
+            a 0.164% chance for pink)
+            
+            The default chances are equal to the vanilla behaviour
             """)
     public String[] initial_colors = {
             "white:40918",
@@ -29,21 +31,30 @@ public class ServerConfig implements ConfigData {
     };
     @Comment("""
             Weight for the child to get the color of the first parent
+            
             (in the default configuration this translates to a 38% chance)
+            
+            For vanilla behaviour change this to 0
             """)
     public int parent_color_1_weight = 114;
     @Comment("""
             Weight for the child to get the color of the second parent
+            
             (in the default configuration this translates to a 38% chance)
+            
+            For vanilla behaviour change this to 0
             """)
     public int parent_color_2_weight = 114;
     @Comment("""
             Special mutation colors and their weight
+            
             (in the default configuration this translates to:
             a 3% chance for black,
             a 0.33% chance for light_blue,
             a 0.33% chance for lime,
             a 0.33% chance for pink)
+            
+            For vanilla behaviour change this to []
             """)
     public String[] mutation_colors = {
             "black:9",
@@ -54,13 +65,20 @@ public class ServerConfig implements ConfigData {
     @Comment("""
             Weight for the child's color to be a blend of the colors of both parents
             (in the default configuration this translates to a 20% chance)
+            
+            By default the blend has an equal chance to be one of the parents colors
+            Exceptions can be defined below
+            
+            For vanilla behaviour change this to 1
             """)
     public int blending_color_weight = 60;
     @Comment("""
-            Breeding sheep of different colors applies one of the parents colors to the child at an equal chance.
-            Exceptions are defined here
+            Blending exceptions are defined here
+            
             Note that by default both permutations for the color pair of black and white are defined
             This means when breeding a black and white sheep there is an equal chance for the child to become gray or light_gray
+            
+            For vanilla behaviour change this to []
             """)
     public String[] color_blending_exceptions = {
             "black+white:gray",
