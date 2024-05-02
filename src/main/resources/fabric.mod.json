@@ -1,14 +1,14 @@
 {
 	"schemaVersion": 1,
 	"id": "customsheepbreeding",
-	"version": "0.0.1",
+	"version": "${version}",
 	"name": "Custom Sheep Breeding",
-	"description": "This Minecraft mod changes the breeding mechanics of sheep.",
+	"description": "Changes the breeding mechanics of sheep.",
 	"authors": [
 		"TheRedBrain"
 	],
 	"contact": {
-		"sources": "https://github.com/TheRedBrain/customsheepbreeding"
+		"sources": "https://https://github.com/TheRedBrain/custom-sheep-breeding"
 	},
 
 	"license": "MIT",
@@ -25,10 +25,10 @@
 		"customsheepbreeding.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.15.7",
-		"minecraft": "1.20.4",
+		"fabricloader": ">=0.15.10",
+		"minecraft": "1.20.6",
 		"java": ">=21",
 		"fabric-api": "*",
-		"cloth-config": ">=13.0.121"
+		"cloth-config": ">=14.0.126"
 	}
 }

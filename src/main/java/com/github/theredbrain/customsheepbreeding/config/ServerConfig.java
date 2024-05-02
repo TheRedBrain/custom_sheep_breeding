@@ -9,6 +9,14 @@ import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
 )
 public class ServerConfig implements ConfigData {
     @Comment("""
+            When set to true, the color of sheep can't be changed permanently with dye items.
+            When a dye item is used, the sheep's color is changed until it is sheared.
+            The natural color is used when determining the child color.
+            
+            For vanilla behaviour change this to false
+            """)
+    public boolean enable_natural_colors = true;
+    @Comment("""
             Initial spawn colors and their weight
             
             (in the default configuration this translates to:
@@ -78,7 +86,8 @@ public class ServerConfig implements ConfigData {
             Note that by default both permutations for the color pair of black and white are defined
             This means when breeding a black and white sheep there is an equal chance for the child to become gray or light_gray
             
-            For vanilla behaviour change this to []
+            For vanilla behaviour change this to
+            ["black+white:gray","blue+green:cyan","blue+red:purple","blue+white:light_blue","gray+white:light_gray","green+white:lime","pink+purple:magenta","red+white:pink","red+yellow:orange"]
             """)
     public String[] color_blending_exceptions = {
             "black+white:gray",

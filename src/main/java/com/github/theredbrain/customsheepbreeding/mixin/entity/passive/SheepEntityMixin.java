@@ -19,7 +19,6 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -52,7 +51,9 @@ public abstract class SheepEntityMixin extends AnimalEntity implements DuckSheep
 
     @Inject(method = "sheared", at = @At("TAIL"))
     public void customsheepbreeding$sheared(SoundCategory shearedSoundCategory, CallbackInfo ci) {
-        this.setColor(this.customsheepbreeding$getNaturalColor());
+        if (CustomSheepBreeding.serverConfig.enable_natural_colors) {
+            this.setColor(this.customsheepbreeding$getNaturalColor());
+        }
     }
 
     @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
@@ -124,23 +125,24 @@ public abstract class SheepEntityMixin extends AnimalEntity implements DuckSheep
      */
     @Overwrite
     private DyeColor getChildColor(AnimalEntity firstParent, AnimalEntity secondParent) {
-        DyeColor parentColor1 = ((DuckSheepEntityMixin) firstParent).customsheepbreeding$getNaturalColor();
-        DyeColor parentColor2 = ((DuckSheepEntityMixin) secondParent).customsheepbreeding$getNaturalColor();
+        var config = CustomSheepBreeding.serverConfig;
+        DyeColor parentColor1 = config.enable_natural_colors ? ((DuckSheepEntityMixin) firstParent).customsheepbreeding$getNaturalColor() : ((SheepEntity)firstParent).getColor();
+        DyeColor parentColor2 = config.enable_natural_colors ? ((DuckSheepEntityMixin) secondParent).customsheepbreeding$getNaturalColor() : ((SheepEntity)secondParent).getColor();
         DyeColor blendingColor = customsheepbreeding$getBlendingColor(parentColor1, parentColor2, this);
 
-        int parent_color_1_weight = CustomSheepBreeding.serverConfig.parent_color_1_weight;
+        int parent_color_1_weight = config.parent_color_1_weight;
         if (parent_color_1_weight < 0) {
             parent_color_1_weight = 0;
         }
-        int parent_color_2_weight = CustomSheepBreeding.serverConfig.parent_color_2_weight;
+        int parent_color_2_weight = config.parent_color_2_weight;
         if (parent_color_2_weight < 0) {
             parent_color_2_weight = 0;
         }
-        int blending_color_weight = CustomSheepBreeding.serverConfig.blending_color_weight;
+        int blending_color_weight = config.blending_color_weight;
         if (blending_color_weight < 1) {
             blending_color_weight = 1;
         }
-        String[] mutation_colors = CustomSheepBreeding.serverConfig.mutation_colors;
+        String[] mutation_colors = config.mutation_colors;
 
         int total_weight = parent_color_1_weight + parent_color_2_weight + blending_color_weight;
         for (String string : mutation_colors) {
