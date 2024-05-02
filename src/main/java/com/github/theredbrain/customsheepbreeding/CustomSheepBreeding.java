@@ -30,10 +30,10 @@ public class CustomSheepBreeding implements ModInitializer {
 		AutoConfig.register(ServerConfigWrapper.class, PartitioningSerializer.wrap(JanksonConfigSerializer::new));
 		serverConfig = ((ServerConfigWrapper)AutoConfig.getConfigHolder(ServerConfigWrapper.class).getConfig()).server;
 
-		configSerialized = ConfigSync.write(serverConfig);
-		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-			sender.sendPacket(ConfigSync.ID, configSerialized);
-		});
+//		configSerialized = ConfigSync.write(serverConfig);
+//		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+//			sender.sendPacket(ConfigSync.ID, configSerialized);
+//		});
 	}
 
 	public static class ConfigSync {

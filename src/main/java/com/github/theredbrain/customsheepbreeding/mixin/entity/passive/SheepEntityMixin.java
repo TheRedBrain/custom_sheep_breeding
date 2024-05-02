@@ -46,8 +46,8 @@ public abstract class SheepEntityMixin extends AnimalEntity implements DuckSheep
     }
 
     @Inject(method = "initDataTracker", at = @At("TAIL"))
-    protected void customsheepbreeding$initDataTracker(CallbackInfo ci) {
-        this.dataTracker.startTracking(NATURAL_COLOR, (byte) 0);
+    protected void customsheepbreeding$initDataTracker(DataTracker.Builder builder, CallbackInfo ci) {
+        builder.add(NATURAL_COLOR, (byte) 0);
     }
 
     @Inject(method = "sheared", at = @At("TAIL"))
@@ -114,7 +114,7 @@ public abstract class SheepEntityMixin extends AnimalEntity implements DuckSheep
     }
 
     @Inject(method = "initialize", at = @At("RETURN"))
-    public void customsheepbreeding$initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, EntityData entityData, NbtCompound entityNbt, CallbackInfoReturnable<EntityData> cir) {
+    public void customsheepbreeding$initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, EntityData entityData, CallbackInfoReturnable<EntityData> cir) {
         this.customsheepbreeding$setNaturalColor(this.getColor());
     }
 
