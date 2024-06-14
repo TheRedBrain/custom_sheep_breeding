@@ -1,8 +1,8 @@
 # Custom Sheep Breeding
 
-This mod changes sheep to have a permanent color that is set during birth (or when installing this mod). This color can not be changed.
+This mod changes sheep to have a natural color that is set during birth (or when installing this mod). This color can not be changed.
 
-Sheep can still be colored using dye items, but after shearing the color is reset to the permanent color again.
+Sheep can still be colored using dye items, but after shearing the color is reset to the natural color again.
 
 Multiple things can be configured in the server config:
 - Enable/disable natural colors (if only the other changes are desired).

@@ -86,7 +86,7 @@ modrinth {
 	versionNumber = mod_version
 	versionType = "release" // can also be "beta" or "alpha"
 	uploadFile = remapJar
-	gameVersions = ['1.20.6'] // An array of game versions the version supports
+	gameVersions = ['1.21'] // An array of game versions the version supports
 	loaders = ['fabric']
 	dependencies = [
 			new ModDependency('P7dR8mSH', 'required'), // Fabric API
