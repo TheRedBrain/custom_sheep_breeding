@@ -1,7 +1,10 @@
 package com.github.theredbrain.customsheepbreeding.mixin.entity.passive;
 
 import com.github.theredbrain.customsheepbreeding.CustomSheepBreeding;
+import com.github.theredbrain.customsheepbreeding.config.ServerConfig;
 import com.github.theredbrain.customsheepbreeding.entity.passive.DuckSheepEntityMixin;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
@@ -19,6 +22,7 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -51,7 +55,7 @@ public abstract class SheepEntityMixin extends AnimalEntity implements DuckSheep
 
     @Inject(method = "sheared", at = @At("TAIL"))
     public void customsheepbreeding$sheared(SoundCategory shearedSoundCategory, CallbackInfo ci) {
-        if (CustomSheepBreeding.serverConfig.enable_natural_colors) {
+        if (CustomSheepBreeding.SERVER_CONFIG.enable_natural_colors.get()) {
             this.setColor(this.customsheepbreeding$getNaturalColor());
         }
     }
@@ -70,13 +74,26 @@ public abstract class SheepEntityMixin extends AnimalEntity implements DuckSheep
         }
     }
 
-    /**
-     * @author TheRedBrain
-     * @reason complete overhaul
-     */
-    @Overwrite
-    public static DyeColor generateDefaultColor(Random random) {
-        String[] initial_colors = CustomSheepBreeding.serverConfig.initial_colors;
+    @Inject(method = "initialize", at = @At("RETURN"))
+    public void customsheepbreeding$initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, EntityData entityData, CallbackInfoReturnable<EntityData> cir) {
+        this.customsheepbreeding$setNaturalColor(this.getColor());
+    }
+
+    @WrapOperation(
+            method = "initialize",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/passive/SheepEntity;generateDefaultColor(Lnet/minecraft/util/math/random/Random;)Lnet/minecraft/util/DyeColor;")
+    )
+    private DyeColor customsheepbreeding$wrap_generateDefaultColor(Random random, Operation<DyeColor> original) {
+        if (CustomSheepBreeding.SERVER_CONFIG.enable_custom_colors.get()) {
+            return customsheepbreeding$generateOverhauledDefaultColor(random);
+        } else {
+            return original.call(random);
+        }
+    }
+
+    @Unique
+    private static DyeColor customsheepbreeding$generateOverhauledDefaultColor(Random random) {
+        String[] initial_colors = CustomSheepBreeding.SERVER_CONFIG.initial_colors;
 
         int total_weight = 0;
         for (String string : initial_colors) {
@@ -104,6 +121,18 @@ public abstract class SheepEntityMixin extends AnimalEntity implements DuckSheep
         return DyeColor.WHITE;
     }
 
+    @WrapOperation(
+            method = "createChild(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/passive/PassiveEntity;)Lnet/minecraft/entity/passive/SheepEntity;",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/passive/SheepEntity;getChildColor(Lnet/minecraft/entity/passive/AnimalEntity;Lnet/minecraft/entity/passive/AnimalEntity;)Lnet/minecraft/util/DyeColor;")
+    )
+    private DyeColor customsheepbreeding$wrap_getChildColor(SheepEntity instance, AnimalEntity firstParent, AnimalEntity secondParent, Operation<DyeColor> original) {
+        if (CustomSheepBreeding.SERVER_CONFIG.enable_custom_colors.get()) {
+            return customsheepbreeding$getOverhauledChildColor(firstParent, secondParent);
+        } else {
+            return original.call(instance, firstParent, secondParent);
+        }
+    }
+
     @Inject(method = "createChild(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/passive/PassiveEntity;)Lnet/minecraft/entity/passive/SheepEntity;", at = @At("RETURN"), cancellable = true)
     public void customsheepbreeding$createChild(ServerWorld serverWorld, PassiveEntity passiveEntity, CallbackInfoReturnable<SheepEntity> cir) {
         SheepEntity sheepEntity = cir.getReturnValue();
@@ -114,31 +143,22 @@ public abstract class SheepEntityMixin extends AnimalEntity implements DuckSheep
         cir.setReturnValue(sheepEntity);
     }
 
-    @Inject(method = "initialize", at = @At("RETURN"))
-    public void customsheepbreeding$initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, EntityData entityData, CallbackInfoReturnable<EntityData> cir) {
-        this.customsheepbreeding$setNaturalColor(this.getColor());
-    }
-
-    /**
-     * @author TheRedBrain
-     * @reason complete overhaul
-     */
-    @Overwrite
-    private DyeColor getChildColor(AnimalEntity firstParent, AnimalEntity secondParent) {
-        var config = CustomSheepBreeding.serverConfig;
-        DyeColor parentColor1 = config.enable_natural_colors ? ((DuckSheepEntityMixin) firstParent).customsheepbreeding$getNaturalColor() : ((SheepEntity)firstParent).getColor();
-        DyeColor parentColor2 = config.enable_natural_colors ? ((DuckSheepEntityMixin) secondParent).customsheepbreeding$getNaturalColor() : ((SheepEntity)secondParent).getColor();
+    @Unique
+    private DyeColor customsheepbreeding$getOverhauledChildColor(AnimalEntity firstParent, AnimalEntity secondParent) {
+        ServerConfig config = CustomSheepBreeding.SERVER_CONFIG;
+        DyeColor parentColor1 = config.enable_natural_colors.get() ? ((DuckSheepEntityMixin) firstParent).customsheepbreeding$getNaturalColor() : ((SheepEntity)firstParent).getColor();
+        DyeColor parentColor2 = config.enable_natural_colors.get() ? ((DuckSheepEntityMixin) secondParent).customsheepbreeding$getNaturalColor() : ((SheepEntity)secondParent).getColor();
         DyeColor blendingColor = customsheepbreeding$getBlendingColor(parentColor1, parentColor2, this);
 
-        int parent_color_1_weight = config.parent_color_1_weight;
+        int parent_color_1_weight = config.parent_color_1_weight.get();
         if (parent_color_1_weight < 0) {
             parent_color_1_weight = 0;
         }
-        int parent_color_2_weight = config.parent_color_2_weight;
+        int parent_color_2_weight = config.parent_color_2_weight.get();
         if (parent_color_2_weight < 0) {
             parent_color_2_weight = 0;
         }
-        int blending_color_weight = config.blending_color_weight;
+        int blending_color_weight = config.blending_color_weight.get();
         if (blending_color_weight < 1) {
             blending_color_weight = 1;
         }
@@ -185,7 +205,7 @@ public abstract class SheepEntityMixin extends AnimalEntity implements DuckSheep
 
     @Unique
     private static DyeColor customsheepbreeding$getBlendingColor(DyeColor parentColor1, DyeColor parentColor2, AnimalEntity entity) {
-        String[] color_blending_exceptions = CustomSheepBreeding.serverConfig.color_blending_exceptions;
+        String[] color_blending_exceptions = CustomSheepBreeding.SERVER_CONFIG.color_blending_exceptions;
 
         // enables random blending when two different blending colors are defined for a pair of colors, should have no effect otherwise
         if (entity.getWorld().random.nextBoolean()) {

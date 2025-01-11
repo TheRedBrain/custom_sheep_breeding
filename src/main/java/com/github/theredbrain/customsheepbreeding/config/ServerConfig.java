@@ -1,13 +1,19 @@
 package com.github.theredbrain.customsheepbreeding.config;
 
-import me.shedaniel.autoconfig.ConfigData;
-import me.shedaniel.autoconfig.annotation.Config;
-import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
+import com.github.theredbrain.customsheepbreeding.CustomSheepBreeding;
+import me.fzzyhmstrs.fzzy_config.annotations.Comment;
+import me.fzzyhmstrs.fzzy_config.annotations.ConvertFrom;
+import me.fzzyhmstrs.fzzy_config.config.Config;
+import me.fzzyhmstrs.fzzy_config.validation.misc.ValidatedBoolean;
+import me.fzzyhmstrs.fzzy_config.validation.misc.ValidatedEnum;
+import me.fzzyhmstrs.fzzy_config.validation.number.ValidatedInt;
+import net.minecraft.util.DyeColor;
 
-@Config(
-        name = "server"
-)
-public class ServerConfig implements ConfigData {
+@ConvertFrom(fileName = "server.json5", folder = "customsheepbreeding")
+public class ServerConfig extends Config {
+    public ServerConfig() {
+        super(CustomSheepBreeding.identifier("server"));
+    }
     @Comment("""
             When set to true, the color of sheep can't be changed permanently with dye items.
             When a dye item is used, the sheep's color is changed until it is sheared.
@@ -15,7 +21,8 @@ public class ServerConfig implements ConfigData {
             
             For vanilla behaviour change this to false
             """)
-    public boolean enable_natural_colors = true;
+    public ValidatedBoolean enable_natural_colors = new ValidatedBoolean(true);
+    public ValidatedBoolean enable_custom_colors = new ValidatedBoolean(true);
     @Comment("""
             Initial spawn colors and their weight
             
@@ -44,7 +51,7 @@ public class ServerConfig implements ConfigData {
             
             For vanilla behaviour change this to 0
             """)
-    public int parent_color_1_weight = 114;
+    public ValidatedInt parent_color_1_weight = new ValidatedInt(114);
     @Comment("""
             Weight for the child to get the color of the second parent
             
@@ -52,7 +59,7 @@ public class ServerConfig implements ConfigData {
             
             For vanilla behaviour change this to 0
             """)
-    public int parent_color_2_weight = 114;
+    public ValidatedInt parent_color_2_weight = new ValidatedInt(114);
     @Comment("""
             Special mutation colors and their weight
             
@@ -79,7 +86,7 @@ public class ServerConfig implements ConfigData {
             
             For vanilla behaviour change this to 1
             """)
-    public int blending_color_weight = 60;
+    public ValidatedInt blending_color_weight = new ValidatedInt(60);
     @Comment("""
             Blending exceptions are defined here
             
