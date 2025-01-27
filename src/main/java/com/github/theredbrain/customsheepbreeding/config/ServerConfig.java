@@ -3,11 +3,17 @@ package com.github.theredbrain.customsheepbreeding.config;
 import com.github.theredbrain.customsheepbreeding.CustomSheepBreeding;
 import me.fzzyhmstrs.fzzy_config.annotations.Comment;
 import me.fzzyhmstrs.fzzy_config.annotations.ConvertFrom;
+import me.fzzyhmstrs.fzzy_config.annotations.Translation;
 import me.fzzyhmstrs.fzzy_config.config.Config;
+import me.fzzyhmstrs.fzzy_config.util.Walkable;
+import me.fzzyhmstrs.fzzy_config.validation.collection.ValidatedMap;
+import me.fzzyhmstrs.fzzy_config.validation.misc.ValidatedAny;
 import me.fzzyhmstrs.fzzy_config.validation.misc.ValidatedBoolean;
 import me.fzzyhmstrs.fzzy_config.validation.misc.ValidatedEnum;
 import me.fzzyhmstrs.fzzy_config.validation.number.ValidatedInt;
 import net.minecraft.util.DyeColor;
+
+import java.util.HashMap;
 
 @ConvertFrom(fileName = "server.json5", folder = "customsheepbreeding")
 public class ServerConfig extends Config {
@@ -36,14 +42,14 @@ public class ServerConfig extends Config {
             
             The default chances are equal to the vanilla behaviour
             """)
-    public String[] initial_colors = {
-            "white:40918",
-            "black:2500",
-            "gray:2500",
-            "light_gray:2500",
-            "brown:1500",
-            "pink:82"
-    };
+    public ValidatedMap<DyeColor, Integer> initial_colors = new ValidatedMap<>(new HashMap<>() {{
+        put(DyeColor.WHITE, 40918);
+        put(DyeColor.BLACK, 2500);
+        put(DyeColor.GRAY, 2500);
+        put(DyeColor.LIGHT_GRAY, 2500);
+        put(DyeColor.BROWN, 1500);
+        put(DyeColor.PINK, 82);
+    }}, new ValidatedEnum<>(DyeColor.WHITE, ValidatedEnum.WidgetType.CYCLING), new ValidatedInt(0));
     @Comment("""
             Weight for the child to get the color of the first parent
             
@@ -71,12 +77,12 @@ public class ServerConfig extends Config {
             
             For vanilla behaviour change this to []
             """)
-    public String[] mutation_colors = {
-            "black:9",
-            "light_blue:1",
-            "lime:1",
-            "pink:1"
-    };
+    public ValidatedMap<DyeColor, Integer> mutation_colors = new ValidatedMap<>(new HashMap<>() {{
+        put(DyeColor.BLACK, 9);
+        put(DyeColor.LIGHT_BLUE, 1);
+        put(DyeColor.LIME, 1);
+        put(DyeColor.PINK, 1);
+    }}, new ValidatedEnum<>(DyeColor.WHITE, ValidatedEnum.WidgetType.CYCLING), new ValidatedInt(0));
     @Comment("""
             Weight for the child's color to be a blend of the colors of both parents
             (in the default configuration this translates to a 20% chance)
@@ -96,21 +102,43 @@ public class ServerConfig extends Config {
             For vanilla behaviour change this to
             ["black+white:gray","blue+green:cyan","blue+red:purple","blue+white:light_blue","gray+white:light_gray","green+white:lime","pink+purple:magenta","red+white:pink","red+yellow:orange"]
             """)
-    public String[] color_blending_exceptions = {
-            "black+white:gray",
-            "white+black:light_gray",
-            "black+light_gray:gray",
-            "gray+white:light_gray",
-            "black+light_blue:blue",
-            "black+lime:green",
-            "black+pink:red",
-            "blue+pink:magenta",
-            "red+light_blue:magenta",
-            "black+magenta:purple",
-            "red+blue:purple",
-            "blue+green:cyan",
-            "red+green:yellow",
-            "cyan+red:brown",
-            "yellow+red:orange"
-    };
+    public ValidatedMap<DyeColorPair, DyeColor> color_blending_exceptions = new ValidatedMap<>(new HashMap<>() {{
+        put(new DyeColorPair(DyeColor.BLACK, DyeColor.WHITE), DyeColor.GRAY);
+        put(new DyeColorPair(DyeColor.WHITE, DyeColor.BLACK), DyeColor.LIGHT_GRAY);
+        put(new DyeColorPair(DyeColor.BLACK, DyeColor.LIGHT_GRAY), DyeColor.GRAY);
+        put(new DyeColorPair(DyeColor.GRAY, DyeColor.WHITE), DyeColor.LIGHT_GRAY);
+        put(new DyeColorPair(DyeColor.BLACK, DyeColor.LIGHT_BLUE), DyeColor.BLUE);
+        put(new DyeColorPair(DyeColor.BLACK, DyeColor.LIME), DyeColor.GREEN);
+        put(new DyeColorPair(DyeColor.BLACK, DyeColor.PINK), DyeColor.RED);
+        put(new DyeColorPair(DyeColor.BLUE, DyeColor.PINK), DyeColor.MAGENTA);
+        put(new DyeColorPair(DyeColor.RED, DyeColor.LIGHT_BLUE), DyeColor.MAGENTA);
+        put(new DyeColorPair(DyeColor.BLACK, DyeColor.MAGENTA), DyeColor.PURPLE);
+        put(new DyeColorPair(DyeColor.RED, DyeColor.BLUE), DyeColor.PURPLE);
+        put(new DyeColorPair(DyeColor.BLUE, DyeColor.GREEN), DyeColor.CYAN);
+        put(new DyeColorPair(DyeColor.RED, DyeColor.GREEN), DyeColor.YELLOW);
+        put(new DyeColorPair(DyeColor.CYAN, DyeColor.RED), DyeColor.BROWN);
+        put(new DyeColorPair(DyeColor.YELLOW, DyeColor.RED), DyeColor.ORANGE);
+    }}, new ValidatedAny<>(new DyeColorPair()), new ValidatedEnum<>(DyeColor.WHITE, ValidatedEnum.WidgetType.CYCLING));
+
+    @Translation(prefix = "customsheepbreeding.server.dye_color_pair")
+    public static class DyeColorPair implements Walkable {
+
+        public DyeColorPair() {
+            new DyeColorPair(DyeColor.WHITE, DyeColor.WHITE);
+        }
+
+        public DyeColorPair(DyeColor color_1, DyeColor color_2) {
+            this.color_1 = color_1;
+            this.color_2 = color_2;
+        }
+
+        public DyeColor color_1;
+        public DyeColor color_2;
+
+        public String toString() {
+            return "color_1: " + this.color_1 + ", color_2: " + this.color_2;
+        }
+
+
+    }
 }

@@ -32,6 +32,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.Map;
+
 @Mixin(SheepEntity.class)
 public abstract class SheepEntityMixin extends AnimalEntity implements DuckSheepEntityMixin {
 
@@ -93,26 +95,22 @@ public abstract class SheepEntityMixin extends AnimalEntity implements DuckSheep
 
     @Unique
     private static DyeColor customsheepbreeding$generateOverhauledDefaultColor(Random random) {
-        String[] initial_colors = CustomSheepBreeding.SERVER_CONFIG.initial_colors;
+        Map<DyeColor, Integer> initial_colors = CustomSheepBreeding.SERVER_CONFIG.initial_colors;
 
         int total_weight = 0;
-        for (String string : initial_colors) {
-            String[] stringArray = string.split(":");
-            DyeColor dyeColor = DyeColor.byName(stringArray[0], null);
-            if (dyeColor != null) {
-                total_weight += Integer.parseInt(stringArray[1]);
+        for (Map.Entry<DyeColor, Integer> entry : initial_colors.entrySet()) {
+            if (entry.getKey() != null) {
+                total_weight += entry.getValue();
             }
         }
 
         int randomInt = random.nextInt(total_weight);
         int threshold = 0;
-        for (String string : initial_colors) {
-            String[] stringArray = string.split(":");
-            DyeColor dyeColor = DyeColor.byName(stringArray[0], null);
-            if (dyeColor != null) {
-                threshold += Integer.parseInt(stringArray[1]);
+        for (Map.Entry<DyeColor, Integer> entry : initial_colors.entrySet()) {
+            if (entry.getKey() != null) {
+                threshold += entry.getValue();
                 if (randomInt < threshold) {
-                    return dyeColor;
+                    return entry.getKey();
                 }
             }
         }
@@ -162,14 +160,13 @@ public abstract class SheepEntityMixin extends AnimalEntity implements DuckSheep
         if (blending_color_weight < 1) {
             blending_color_weight = 1;
         }
-        String[] mutation_colors = config.mutation_colors;
+//        String[] mutation_colors = config.mutation_colors;
+        Map<DyeColor, Integer> mutation_colors = CustomSheepBreeding.SERVER_CONFIG.mutation_colors;
 
         int total_weight = parent_color_1_weight + parent_color_2_weight + blending_color_weight;
-        for (String string : mutation_colors) {
-            String[] stringArray = string.split(":");
-            DyeColor dyeColor = DyeColor.byName(stringArray[0], null);
-            if (dyeColor != null) {
-                total_weight += Integer.parseInt(stringArray[1]);
+        for (Map.Entry<DyeColor, Integer> entry : mutation_colors.entrySet()) {
+            if (entry.getKey() != null) {
+                total_weight += entry.getValue();
             }
         }
 
@@ -186,13 +183,11 @@ public abstract class SheepEntityMixin extends AnimalEntity implements DuckSheep
                 if (randomInt < threshold) {
                     return blendingColor;
                 } else {
-                    for (String string : mutation_colors) {
-                        String[] stringArray = string.split(":");
-                        DyeColor dyeColor = DyeColor.byName(stringArray[0], null);
-                        if (dyeColor != null) {
-                            threshold += Integer.parseInt(stringArray[1]);
+                    for (Map.Entry<DyeColor, Integer> entry : mutation_colors.entrySet()) {
+                        if (entry.getKey() != null) {
+                            threshold += entry.getValue();
                             if (randomInt < threshold) {
-                                return dyeColor;
+                                return entry.getKey();
                             }
                         }
                     }
@@ -205,7 +200,7 @@ public abstract class SheepEntityMixin extends AnimalEntity implements DuckSheep
 
     @Unique
     private static DyeColor customsheepbreeding$getBlendingColor(DyeColor parentColor1, DyeColor parentColor2, AnimalEntity entity) {
-        String[] color_blending_exceptions = CustomSheepBreeding.SERVER_CONFIG.color_blending_exceptions;
+        Map<ServerConfig.DyeColorPair, DyeColor> color_blending_exceptions = CustomSheepBreeding.SERVER_CONFIG.color_blending_exceptions;
 
         // enables random blending when two different blending colors are defined for a pair of colors, should have no effect otherwise
         if (entity.getWorld().random.nextBoolean()) {
@@ -214,13 +209,9 @@ public abstract class SheepEntityMixin extends AnimalEntity implements DuckSheep
             parentColor2 = temp;
         }
 
-        DyeColor dyeColor = null;
-        for (String string : color_blending_exceptions) {
-            String[] stringArray = string.split(":");
-            if (stringArray[0].equals(parentColor1.getName() + "+" + parentColor2.getName()) || stringArray[0].equals(parentColor2.getName() + "+" + parentColor1.getName())) {
-                String dyeColorString = stringArray[1];
-                dyeColor = DyeColor.byName(dyeColorString, null);
-            }
+        DyeColor dyeColor = color_blending_exceptions.get(new ServerConfig.DyeColorPair(parentColor1, parentColor2));
+        if (dyeColor == null) {
+            dyeColor = color_blending_exceptions.get(new ServerConfig.DyeColorPair(parentColor2, parentColor1));
         }
         return dyeColor != null ? dyeColor : entity.getWorld().random.nextBoolean() ? parentColor1 : parentColor2;
     }
